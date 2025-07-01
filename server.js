@@ -23,7 +23,7 @@ app.post('/sendTicket', async (req, res) => {
         from: process.env.EMAIL_USER,
         to: email,
         subject: `Ticket for Coding Conf. Jan 31, 2025 / Austin, TX`,
-        text: html,
+        html: html,
         attachments: [
             {
                 filename: 'ticket.html',
