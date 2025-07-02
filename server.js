@@ -9,7 +9,7 @@ app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 
 app.post('/sendTicket', async (req, res) => {
-    const { email, html } = req.body;
+    const { email, image } = req.body;
 
     const transporter = nodemailer.createTransport({
         service: 'gmail',
@@ -19,28 +19,26 @@ app.post('/sendTicket', async (req, res) => {
         }
     });
 
-    const mailOptions = {
-        from: process.env.EMAIL_USER,
-        to: email,
-        subject: `Ticket for Coding Conf. Jan 31, 2025 / Austin, TX`,
-        html: html,
-        attachments: [
-            {
-                filename: 'ticket.html',
-                content: html,
-                contentType: 'text/html'
-            }
-        ]
-    };
+    const htmlContent = `<html><head><style>body {font-family: Arial, sans-serif;background-color: rgb(18, 2, 53);padding: 20px;color: hsl(0, 0%, 100%);}.container {max-width: 600px;margin: 0 auto;padding: 30px;border-radius: 10px;box-shadow: 0 0 10px rgba(0,0,0,0.1);}.header {text-align: center;margin-bottom: 20px;}.ticket-image {width: 100%;border-radius: 8px;margin: 20px 0;}.footer {text-align: center;margin-top: 20px;color: hsla(252, 6%, 83%, 0.7);font-size: 14px;}</style></head><body><div class="container"><div class="header"><h1>Coding Conference 2025</h1><p>Your ticket is attached to this email</p></div><p>Hello,</p><p>Thank you for registering for the Coding Conference 2025! Your ticket is attached to this email.</p><p>You can also view your ticket below:</p>
+    <img class="ticket-image" src="cid:ticketImage" alt="Conference Ticket">
+    <p>We look forward to seeing you on January 31, 2025 in Austin, TX!</p><p>Best regards,<br>Coding Conference Team</p><div class="footer"><p>This email was sent automatically. Please do not reply.</p></div></div></body></html>`;
 
-    transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-            console.error(error);
-            res.status(500).json({ error: 'Błąd wysyłki maila' });
-        } else {
-            res.json({ status: 'OK' });
-        }
-    });
+        const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: email,
+            subject: `Your Conference Ticket - Coding Conf 2025`,
+            html: htmlContent,
+            attachments: [
+                {
+                    filename: 'conference-ticket.png',
+                    content: image, 
+                    encoding: 'base64',
+                    cid: 'ticketImage' 
+                }
+            ]
+        };
+
+    transporter.sendMail(mailOptions);
 });
 
 app.listen(port, () => {
